@@ -4,39 +4,70 @@ from time import sleep
 from IT8951 import constants
 from IT8951.display import AutoEPDDisplay
 
+from web3 import Web3
+import requests
+
 import logging
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 V_COM = -2.37
+WEB3_POLL_INTERVAL = 1.0
 
 
 class App():
 
-    def main(self):
-        logger.info('Initializing EPD...')
+    def __init__(self, web3: Web3, display):
+        self.web3 = web3
+        self.display = display
 
-        display = AutoEPDDisplay(vcom=V_COM, flip=True)
-        logger.info(f'VCOM set to {display.epd.get_vcom()}')
+    def main(self):
+        logger.info('listening to new blocks...')
+        new_block_filter = self.web3.eth.filter('latest')
+        while True:
+            block_hashes = list(new_block_filter.get_new_entries())
+            if len(block_hashes) > 0:
+                self.handle_block(block_hashes[-1])  # skip stale blocks because rendering might take longer
+            sleep(WEB3_POLL_INTERVAL)
+
+    def handle_block(self, block_hash):
+        logger.info(f'got block: {Web3.toHex(block_hash)}')
+        block_number = self.web3.eth.block_number
+        logger.info(f'block number: {block_number}')
+        self.render({
+            'block_number': block_number,
+            **self.fetch_gas_info(),
+        })
+
+    def fetch_gas_info(self):
+        ret = requests.get('https://www.gasnow.org/api/v3/gas/price').json()
+        return {
+            'rapid': int(float(ret['data']['rapid']) / 1e9),
+            'fast': int(float(ret['data']['fast']) / 1e9),
+            'standard': int(float(ret['data']['standard']) / 1e9),
+            'slow': int(float(ret['data']['slow']) / 1e9),
+        }
+
+    def render(self, info):
+        logger.info(f'rendering info: {info}')
 
         # 1448 x 1072
-        logger.info('rendering texts...')
-        display.frame_buf.paste(0xFF, box=(0, 0, display.width, display.height))
+        self.display.frame_buf.paste(0xFF, box=(0, 0, self.display.width, self.display.height))
 
-        self._place_text(display.frame_buf, 'Rapid', fontsize=80, x_offset=-543, y_offset=-402)
-        self._place_text(display.frame_buf, 'Fast', fontsize=80, x_offset=-181, y_offset=-402)
-        self._place_text(display.frame_buf, 'Standard', fontsize=80, x_offset=181, y_offset=-402)
-        self._place_text(display.frame_buf, 'Slow', fontsize=80, x_offset=543, y_offset=-402)
+        self._place_text(self.display.frame_buf, 'Rapid', fontsize=80, x_offset=-543, y_offset=-402)
+        self._place_text(self.display.frame_buf, 'Fast', fontsize=80, x_offset=-181, y_offset=-402)
+        self._place_text(self.display.frame_buf, 'Standard', fontsize=80, x_offset=181, y_offset=-402)
+        self._place_text(self.display.frame_buf, 'Slow', fontsize=80, x_offset=543, y_offset=-402)
 
-        self._place_text(display.frame_buf, '29', fontsize=160, x_offset=-543, y_offset=-134, fill='#000')
-        self._place_text(display.frame_buf, '23', fontsize=160, x_offset=-181, y_offset=-134, fill='#444')
-        self._place_text(display.frame_buf, '21', fontsize=160, x_offset=181, y_offset=-134, fill='#888')
-        self._place_text(display.frame_buf, '21', fontsize=160, x_offset=543, y_offset=-134, fill='#bbb')
+        self._place_text(self.display.frame_buf, str(info['rapid']), fontsize=160, x_offset=-543, y_offset=-134, fill='#000')
+        self._place_text(self.display.frame_buf, str(info['fast']), fontsize=160, x_offset=-181, y_offset=-134, fill='#444')
+        self._place_text(self.display.frame_buf, str(info['standard']), fontsize=160, x_offset=181, y_offset=-134, fill='#888')
+        self._place_text(self.display.frame_buf, str(info['slow']), fontsize=160, x_offset=543, y_offset=-134, fill='#bbb')
 
-        self._place_text(display.frame_buf, 'Block Number:', fontsize=80, x_offset=-268, y_offset=268)
-        self._place_text(display.frame_buf, '12578633', fontsize=120, x_offset=300, y_offset=268)
+        self._place_text(self.display.frame_buf, 'Block Number:', fontsize=80, x_offset=-268, y_offset=268)
+        self._place_text(self.display.frame_buf, str(info['block_number']), fontsize=120, x_offset=300, y_offset=268)
 
-        display.draw_full(constants.DisplayModes.GC16)
+        self.display.draw_full(constants.DisplayModes.GC16)
 
     # this function is just a helper for the others
     def _place_text(self, img, text, fontsize=80, x_offset=0, y_offset=0, fill='#000'):
@@ -66,4 +97,10 @@ if __name__ == '__main__':
         stream=sys.stdout,
     )
 
-    App().main()
+    logger.info('Initializing EPD...')
+
+    display = AutoEPDDisplay(vcom=V_COM, flip=True)
+    logger.info(f'VCOM set to {display.epd.get_vcom()}')
+
+    web3 = Web3(Web3.HTTPProvider('https://mainnet.infura.io/v3/your-api-key'))
+    App(web3=web3, display=display).main()

@@ -1,2 +1,4 @@
 RPi.GPIO==0.7.0
 pillow==8.2.0
+web3==5.19.0
+requests==2.21.0
