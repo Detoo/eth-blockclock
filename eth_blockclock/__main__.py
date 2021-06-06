@@ -31,18 +31,18 @@ class App():
         self._place_text(display.frame_buf, 'Standard', fontsize=80, x_offset=181, y_offset=-402)
         self._place_text(display.frame_buf, 'Slow', fontsize=80, x_offset=543, y_offset=-402)
 
-        self._place_text(display.frame_buf, '19', fontsize=160, x_offset=-543, y_offset=-134)
-        self._place_text(display.frame_buf, '12', fontsize=160, x_offset=-181, y_offset=-134)
-        self._place_text(display.frame_buf, '10', fontsize=160, x_offset=181, y_offset=-134)
-        self._place_text(display.frame_buf, '10', fontsize=160, x_offset=543, y_offset=-134)
+        self._place_text(display.frame_buf, '19', fontsize=160, x_offset=-543, y_offset=-134, fill='#000')
+        self._place_text(display.frame_buf, '12', fontsize=160, x_offset=-181, y_offset=-134, fill='#444')
+        self._place_text(display.frame_buf, '10', fontsize=160, x_offset=181, y_offset=-134, fill='#888')
+        self._place_text(display.frame_buf, '10', fontsize=160, x_offset=543, y_offset=-134, fill='#bbb')
 
         self._place_text(display.frame_buf, 'Block Number:', fontsize=80, x_offset=-268, y_offset=268)
         self._place_text(display.frame_buf, '12578597', fontsize=120, x_offset=300, y_offset=268)
 
-        display.draw_partial(constants.DisplayModes.DU)
+        display.draw_full(constants.DisplayModes.GC16)
 
     # this function is just a helper for the others
-    def _place_text(self, img, text, fontsize=80, x_offset=0, y_offset=0):
+    def _place_text(self, img, text, fontsize=80, x_offset=0, y_offset=0, fill='#000'):
         """
         Put some centered text at a location on the image.
         """
@@ -56,7 +56,7 @@ class App():
         draw_x = (img_width - text_width)//2 + x_offset
         draw_y = (img_height - text_height)//2 + y_offset
 
-        draw.text((draw_x, draw_y), text, font=font)
+        draw.text((draw_x, draw_y), text, font=font, fill=fill)
 
 
 if __name__ == '__main__':
