@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
+from time import sleep
 
 from IT8951 import constants
 from IT8951.display import AutoEPDDisplay
@@ -21,28 +22,30 @@ class App():
         logger.info('clearing display...')
         display.clear()
 
-        # clear image to white
+        # 1448 x 1072
+        logger.info('rendering texts...')
         display.frame_buf.paste(0xFF, box=(0, 0, display.width, display.height))
 
-        logger.info('writing full...')
-        self._place_text(display.frame_buf, 'partial', x_offset=-200)
-        display.draw_full(constants.DisplayModes.GC16)
+        self._place_text(display.frame_buf, 'Rapid', fontsize=80, x_offset=-543, y_offset=-402)
+        self._place_text(display.frame_buf, 'Fast', fontsize=80, x_offset=-181, y_offset=-402)
+        self._place_text(display.frame_buf, 'Standard', fontsize=80, x_offset=181, y_offset=-402)
+        self._place_text(display.frame_buf, 'Slow', fontsize=80, x_offset=543, y_offset=-402)
 
-        # TODO: should use 1bpp for partial text update
-        logger.info('writing partial...')
-        self._place_text(display.frame_buf, 'update', x_offset=+200)
+        self._place_text(display.frame_buf, '19', fontsize=160, x_offset=-543, y_offset=-134)
+        self._place_text(display.frame_buf, '12', fontsize=160, x_offset=-181, y_offset=-134)
+        self._place_text(display.frame_buf, '10', fontsize=160, x_offset=181, y_offset=-134)
+        self._place_text(display.frame_buf, '10', fontsize=160, x_offset=543, y_offset=-134)
+
+        self._place_text(display.frame_buf, 'Block Number:', fontsize=80, x_offset=-268, y_offset=268)
+        self._place_text(display.frame_buf, '12578597', fontsize=120, x_offset=300, y_offset=268)
+
         display.draw_partial(constants.DisplayModes.DU)
 
-        logger.info('clearing display...')
-        display.clear()
-
     # this function is just a helper for the others
-    def _place_text(self, img, text, x_offset=0, y_offset=0):
+    def _place_text(self, img, text, fontsize=80, x_offset=0, y_offset=0):
         """
         Put some centered text at a location on the image.
         """
-        fontsize = 80
-
         draw = ImageDraw.Draw(img)
         font = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeSans.ttf', fontsize)
 
