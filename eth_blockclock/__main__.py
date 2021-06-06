@@ -19,9 +19,6 @@ class App():
         display = AutoEPDDisplay(vcom=V_COM, flip=True)
         logger.info(f'VCOM set to {display.epd.get_vcom()}')
 
-        logger.info('clearing display...')
-        display.clear()
-
         # 1448 x 1072
         logger.info('rendering texts...')
         display.frame_buf.paste(0xFF, box=(0, 0, display.width, display.height))
@@ -31,13 +28,13 @@ class App():
         self._place_text(display.frame_buf, 'Standard', fontsize=80, x_offset=181, y_offset=-402)
         self._place_text(display.frame_buf, 'Slow', fontsize=80, x_offset=543, y_offset=-402)
 
-        self._place_text(display.frame_buf, '19', fontsize=160, x_offset=-543, y_offset=-134, fill='#000')
-        self._place_text(display.frame_buf, '12', fontsize=160, x_offset=-181, y_offset=-134, fill='#444')
-        self._place_text(display.frame_buf, '10', fontsize=160, x_offset=181, y_offset=-134, fill='#888')
-        self._place_text(display.frame_buf, '10', fontsize=160, x_offset=543, y_offset=-134, fill='#bbb')
+        self._place_text(display.frame_buf, '29', fontsize=160, x_offset=-543, y_offset=-134, fill='#000')
+        self._place_text(display.frame_buf, '23', fontsize=160, x_offset=-181, y_offset=-134, fill='#444')
+        self._place_text(display.frame_buf, '21', fontsize=160, x_offset=181, y_offset=-134, fill='#888')
+        self._place_text(display.frame_buf, '21', fontsize=160, x_offset=543, y_offset=-134, fill='#bbb')
 
         self._place_text(display.frame_buf, 'Block Number:', fontsize=80, x_offset=-268, y_offset=268)
-        self._place_text(display.frame_buf, '12578597', fontsize=120, x_offset=300, y_offset=268)
+        self._place_text(display.frame_buf, '12578633', fontsize=120, x_offset=300, y_offset=268)
 
         display.draw_full(constants.DisplayModes.GC16)
 
