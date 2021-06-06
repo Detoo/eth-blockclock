@@ -16,7 +16,7 @@ class App():
     def main(self):
         logger.info('Initializing EPD...')
 
-        display = AutoEPDDisplay(vcom=V_COM)
+        display = AutoEPDDisplay(vcom=V_COM, flip=True)
         logger.info(f'VCOM set to {display.epd.get_vcom()}')
 
         logger.info('clearing display...')
