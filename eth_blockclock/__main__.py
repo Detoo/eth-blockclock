@@ -59,10 +59,10 @@ class App():
         self._place_text(self.display.frame_buf, 'Standard', fontsize=80, x_offset=181, y_offset=-402)
         self._place_text(self.display.frame_buf, 'Slow', fontsize=80, x_offset=543, y_offset=-402)
 
-        self._place_text(self.display.frame_buf, str(info['rapid']), fontsize=160, x_offset=-543, y_offset=-134, fill='#000')
-        self._place_text(self.display.frame_buf, str(info['fast']), fontsize=160, x_offset=-181, y_offset=-134, fill='#444')
-        self._place_text(self.display.frame_buf, str(info['standard']), fontsize=160, x_offset=181, y_offset=-134, fill='#888')
-        self._place_text(self.display.frame_buf, str(info['slow']), fontsize=160, x_offset=543, y_offset=-134, fill='#bbb')
+        self._place_text(self.display.frame_buf, str(info['rapid']), fontsize=200, x_offset=-543, y_offset=-134, fill='#000')
+        self._place_text(self.display.frame_buf, str(info['fast']), fontsize=200, x_offset=-181, y_offset=-134, fill='#444')
+        self._place_text(self.display.frame_buf, str(info['standard']), fontsize=200, x_offset=181, y_offset=-134, fill='#888')
+        self._place_text(self.display.frame_buf, str(info['slow']), fontsize=200, x_offset=543, y_offset=-134, fill='#bbb')
 
         self._place_text(self.display.frame_buf, 'Block Number:', fontsize=80, x_offset=-268, y_offset=268)
         self._place_text(self.display.frame_buf, str(info['block_number']), fontsize=120, x_offset=300, y_offset=268)
