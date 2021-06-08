@@ -54,18 +54,18 @@ class App():
         # 1448 x 1072
         self.display.frame_buf.paste(0xFF, box=(0, 0, self.display.width, self.display.height))
 
-        self._place_text(self.display.frame_buf, 'Rapid', fontsize=80, x_offset=-543, y_offset=-402)
-        self._place_text(self.display.frame_buf, 'Fast', fontsize=80, x_offset=-181, y_offset=-402)
-        self._place_text(self.display.frame_buf, 'Standard', fontsize=80, x_offset=181, y_offset=-402)
-        self._place_text(self.display.frame_buf, 'Slow', fontsize=80, x_offset=543, y_offset=-402)
+        self._place_text(self.display.frame_buf, 'Rapid', fontsize=120, x_offset=-543, y_offset=-402)
+        self._place_text(self.display.frame_buf, 'Fast', fontsize=120, x_offset=-181, y_offset=-402)
+        self._place_text(self.display.frame_buf, 'Standard', fontsize=120, x_offset=181, y_offset=-402)
+        self._place_text(self.display.frame_buf, 'Slow', fontsize=120, x_offset=543, y_offset=-402)
 
-        self._place_text(self.display.frame_buf, str(info['rapid']), fontsize=200, x_offset=-543, y_offset=-134, fill='#000')
-        self._place_text(self.display.frame_buf, str(info['fast']), fontsize=200, x_offset=-181, y_offset=-134, fill='#444')
-        self._place_text(self.display.frame_buf, str(info['standard']), fontsize=200, x_offset=181, y_offset=-134, fill='#888')
-        self._place_text(self.display.frame_buf, str(info['slow']), fontsize=200, x_offset=543, y_offset=-134, fill='#bbb')
+        self._place_text(self.display.frame_buf, str(info['rapid']), fontsize=400, x_offset=-543, y_offset=-134, fill='#000')
+        self._place_text(self.display.frame_buf, str(info['fast']), fontsize=400, x_offset=-181, y_offset=-134, fill='#444')
+        self._place_text(self.display.frame_buf, str(info['standard']), fontsize=400, x_offset=181, y_offset=-134, fill='#888')
+        self._place_text(self.display.frame_buf, str(info['slow']), fontsize=400, x_offset=543, y_offset=-134, fill='#bbb')
 
-        self._place_text(self.display.frame_buf, 'Block Number:', fontsize=80, x_offset=-268, y_offset=268)
-        self._place_text(self.display.frame_buf, str(info['block_number']), fontsize=120, x_offset=300, y_offset=268)
+        self._place_text(self.display.frame_buf, 'Block Number:', fontsize=120, x_offset=-362, y_offset=268)
+        self._place_text(self.display.frame_buf, str(info['block_number']), fontsize=350, x_offset=300, y_offset=268)
 
         self.display.draw_full(constants.DisplayModes.GC16)
 
@@ -75,7 +75,7 @@ class App():
         Put some centered text at a location on the image.
         """
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeSans.ttf', fontsize)
+        font = ImageFont.truetype('res/fonts/ShockingHeadline-vYKA.ttf', fontsize)
 
         img_width, img_height = img.size
         text_width, _ = font.getsize(text)
