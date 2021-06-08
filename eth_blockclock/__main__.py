@@ -69,19 +69,27 @@ class App():
         # 1448 x 1072
         self.display.frame_buf.paste(0xFF, box=(0, 0, self.display.width, self.display.height))
 
-        self._place_text(self.display.frame_buf, 'Rapid', fontsize=120, x_offset=-543, y_offset=-402)
-        self._place_text(self.display.frame_buf, 'Fast', fontsize=120, x_offset=-181, y_offset=-402)
-        self._place_text(self.display.frame_buf, 'Standard', fontsize=120, x_offset=181, y_offset=-402)
-        self._place_text(self.display.frame_buf, 'Slow', fontsize=120, x_offset=543, y_offset=-402)
+        # switch row ordering periodically to avoid burn-in
+        if info['block_number'] // 10 % 2:
+            gas_row_y, block_row_y = -268, 268
+        else:
+            gas_row_y, block_row_y = 180, -268
 
-        self._place_text(self.display.frame_buf, str(info['rapid']), fontsize=400, x_offset=-543, y_offset=-134, fill='#000')
-        self._place_text(self.display.frame_buf, str(info['fast']), fontsize=400, x_offset=-181, y_offset=-134, fill='#444')
-        self._place_text(self.display.frame_buf, str(info['standard']), fontsize=400, x_offset=181, y_offset=-134, fill='#888')
-        self._place_text(self.display.frame_buf, str(info['slow']), fontsize=400, x_offset=543, y_offset=-134, fill='#bbb')
+        # gas row
+        self._place_text(self.display.frame_buf, 'Rapid', fontsize=120, x_offset=-543, y_offset=gas_row_y - 134)
+        self._place_text(self.display.frame_buf, 'Fast', fontsize=120, x_offset=-181, y_offset=gas_row_y - 134)
+        self._place_text(self.display.frame_buf, 'Standard', fontsize=120, x_offset=181, y_offset=gas_row_y - 134)
+        self._place_text(self.display.frame_buf, 'Slow', fontsize=120, x_offset=543, y_offset=gas_row_y - 134)
 
-        self._place_text(self.display.frame_buf, 'Block', fontsize=120, x_offset=-210, y_offset=268)
-        self._place_text(self.display.frame_buf, str(info['block_number']), fontsize=350, x_offset=300, y_offset=268)
-        self._place_img(self.display.frame_buf, self.eth_logo, x_offset=-524, y_offset=268)
+        self._place_text(self.display.frame_buf, str(info['rapid']), fontsize=400, x_offset=-543, y_offset=gas_row_y + 134, fill='#000')
+        self._place_text(self.display.frame_buf, str(info['fast']), fontsize=400, x_offset=-181, y_offset=gas_row_y + 134, fill='#444')
+        self._place_text(self.display.frame_buf, str(info['standard']), fontsize=400, x_offset=181, y_offset=gas_row_y + 134, fill='#888')
+        self._place_text(self.display.frame_buf, str(info['slow']), fontsize=400, x_offset=543, y_offset=gas_row_y + 134, fill='#bbb')
+
+        # block row
+        self._place_text(self.display.frame_buf, 'Block', fontsize=120, x_offset=-210, y_offset=block_row_y)
+        self._place_text(self.display.frame_buf, str(info['block_number']), fontsize=350, x_offset=300, y_offset=block_row_y)
+        self._place_img(self.display.frame_buf, self.eth_logo, x_offset=-524, y_offset=block_row_y)
 
         self.display.draw_full(constants.DisplayModes.GC16)
 
