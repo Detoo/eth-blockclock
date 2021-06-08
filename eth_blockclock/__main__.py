@@ -88,7 +88,7 @@ class App():
         Put some centered text at a location on the image.
         """
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype('res/fonts/ShockingHeadline-vYKA.ttf', fontsize)
+        font = ImageFont.truetype('res/fonts/BmCinemaA16-9j2.ttf', fontsize)
 
         img_width, img_height = img.size
         text_width, _ = font.getsize(text)
