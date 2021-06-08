@@ -34,6 +34,8 @@ class App():
         self.http.mount("https://", adapter)
         self.http.mount("http://", adapter)
 
+        self.eth_logo = Image.open('res/imgs/eth-logo.png')
+
     def main(self):
         logger.info('listening to new blocks...')
         new_block_filter = self.web3.eth.filter('latest')
@@ -77,20 +79,20 @@ class App():
         self._place_text(self.display.frame_buf, str(info['standard']), fontsize=400, x_offset=181, y_offset=-134, fill='#888')
         self._place_text(self.display.frame_buf, str(info['slow']), fontsize=400, x_offset=543, y_offset=-134, fill='#bbb')
 
-        self._place_text(self.display.frame_buf, 'Block Number', fontsize=120, x_offset=-362, y_offset=268)
+        self._place_text(self.display.frame_buf, 'Block', fontsize=120, x_offset=-210, y_offset=268)
         self._place_text(self.display.frame_buf, str(info['block_number']), fontsize=350, x_offset=300, y_offset=268)
+        self._place_img(self.display.frame_buf, self.eth_logo, x_offset=-524, y_offset=268)
 
         self.display.draw_full(constants.DisplayModes.GC16)
 
-    # this function is just a helper for the others
-    def _place_text(self, img, text, fontsize=80, x_offset=0, y_offset=0, fill='#000'):
+    def _place_text(self, buf, text, fontsize=80, x_offset=0, y_offset=0, fill='#000'):
         """
         Put some centered text at a location on the image.
         """
-        draw = ImageDraw.Draw(img)
+        draw = ImageDraw.Draw(buf)
         font = ImageFont.truetype('res/fonts/BmCinemaA16-9j2.ttf', fontsize)
 
-        img_width, img_height = img.size
+        img_width, img_height = buf.size
         text_width, _ = font.getsize(text)
         text_height = fontsize
 
@@ -98,6 +100,12 @@ class App():
         draw_y = (img_height - text_height)//2 + y_offset
 
         draw.text((draw_x, draw_y), text, font=font, fill=fill)
+
+    def _place_img(self, buf, img, x_offset=0, y_offset=0):
+        buf.paste(img, [
+            (self.display.frame_buf.size[0] - self.eth_logo.size[0])//2 + x_offset,
+            (self.display.frame_buf.size[1] - self.eth_logo.size[1])//2 + y_offset
+        ])
 
 
 if __name__ == '__main__':
