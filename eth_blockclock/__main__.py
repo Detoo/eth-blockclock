@@ -8,6 +8,7 @@ from web3 import Web3
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+import qrcode
 
 import logging
 logger = logging.getLogger(__name__)
@@ -47,10 +48,21 @@ class App():
 
     def handle_block(self, block_hash):
         logger.info(f'got block: {Web3.toHex(block_hash)}')
-        block_number = self.web3.eth.block_number
-        logger.info(f'block number: {block_number}')
+
+        # retry fetching block info a few times because it might not be ready on the node yet
+        for i in range(3):
+            block = self.web3.eth.get_block(block_hash)
+            if block:
+                break
+            sleep(0.1)
+        else:
+            logger.warning(f'unable to fetch info for block hash: {block_hash}, skipping...')
+            return
+
+        logger.info(f"block number: {block['number']}")
         self.render({
-            'block_number': block_number,
+            'block_number': block['number'],
+            'block_hash': Web3.toHex(block_hash),
             **self.fetch_gas_info(),
         })
 
@@ -87,11 +99,27 @@ class App():
         self._place_text(self.display.frame_buf, str(info['slow']), fontsize=400, x_offset=543, y_offset=gas_row_y + 134, fill='#bbb')
 
         # block row
-        self._place_text(self.display.frame_buf, 'Block', fontsize=120, x_offset=-210, y_offset=block_row_y)
         self._place_text(self.display.frame_buf, str(info['block_number']), fontsize=350, x_offset=300, y_offset=block_row_y)
-        self._place_img(self.display.frame_buf, self.eth_logo, x_offset=-524, y_offset=block_row_y)
+        self._place_img(self.display.frame_buf, self.eth_logo, x_offset=-564, y_offset=block_row_y)
+        self._place_img(
+            self.display.frame_buf,
+            self._gen_qr_img(info['block_hash']),
+            x_offset=-250,
+            y_offset=block_row_y
+        )
 
         self.display.draw_full(constants.DisplayModes.GC16)
+
+    def _gen_qr_img(self, data):
+        qr_gen = qrcode.QRCode(
+            version=None,
+            error_correction=qrcode.constants.ERROR_CORRECT_M,
+            box_size=8,
+            border=0,
+        )
+        qr_gen.add_data(data)
+        qr_gen.make(fit=True)
+        return qr_gen.make_image(fill_color="black", back_color="white")
 
     def _place_text(self, buf, text, fontsize=80, x_offset=0, y_offset=0, fill='#000'):
         """
@@ -111,8 +139,8 @@ class App():
 
     def _place_img(self, buf, img, x_offset=0, y_offset=0):
         buf.paste(img, [
-            (self.display.frame_buf.size[0] - self.eth_logo.size[0])//2 + x_offset,
-            (self.display.frame_buf.size[1] - self.eth_logo.size[1])//2 + y_offset
+            (self.display.frame_buf.size[0] - img.size[0])//2 + x_offset,
+            (self.display.frame_buf.size[1] - img.size[1])//2 + y_offset
         ])
 
 
