@@ -6,6 +6,8 @@ from IT8951.display import AutoEPDDisplay
 
 from web3 import Web3
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 import logging
 logger = logging.getLogger(__name__)
@@ -20,6 +22,17 @@ class App():
     def __init__(self, web3: Web3, display):
         self.web3 = web3
         self.display = display
+
+        retry_strategy = Retry(
+            total=3,
+            backoff_factor=1,
+            status_forcelist=[429, 500, 502, 503, 504],
+            method_whitelist=["HEAD", "GET", "OPTIONS"]
+        )
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        self.http = requests.Session()
+        self.http.mount("https://", adapter)
+        self.http.mount("http://", adapter)
 
     def main(self):
         logger.info('listening to new blocks...')
@@ -40,7 +53,7 @@ class App():
         })
 
     def fetch_gas_info(self):
-        ret = requests.get('https://www.gasnow.org/api/v3/gas/price').json()
+        ret = self.http.get('https://www.gasnow.org/api/v3/gas/price').json()
         return {
             'rapid': int(float(ret['data']['rapid']) / 1e9),
             'fast': int(float(ret['data']['fast']) / 1e9),
@@ -64,7 +77,7 @@ class App():
         self._place_text(self.display.frame_buf, str(info['standard']), fontsize=400, x_offset=181, y_offset=-134, fill='#888')
         self._place_text(self.display.frame_buf, str(info['slow']), fontsize=400, x_offset=543, y_offset=-134, fill='#bbb')
 
-        self._place_text(self.display.frame_buf, 'Block Number:', fontsize=120, x_offset=-362, y_offset=268)
+        self._place_text(self.display.frame_buf, 'Block Number', fontsize=120, x_offset=-362, y_offset=268)
         self._place_text(self.display.frame_buf, str(info['block_number']), fontsize=350, x_offset=300, y_offset=268)
 
         self.display.draw_full(constants.DisplayModes.GC16)
