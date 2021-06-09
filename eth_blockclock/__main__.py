@@ -51,10 +51,14 @@ class App():
 
         # retry fetching block info a few times because it might not be ready on the node yet
         for i in range(3):
-            block = self.web3.eth.get_block(block_hash)
-            if block:
-                break
-            sleep(0.1)
+            try:
+                block = self.web3.eth.get_block(block_hash)
+                if block:
+                    break
+            except Exception as e:
+                logger.warning(f'got exception fetching block info, will retry, error: {str(e)}')
+                pass
+            sleep(0.5)
         else:
             logger.warning(f'unable to fetch info for block hash: {block_hash}, skipping...')
             return
@@ -146,6 +150,7 @@ class App():
 
 if __name__ == '__main__':
 
+    import json
     import sys
 
     logging.basicConfig(
@@ -154,10 +159,13 @@ if __name__ == '__main__':
         stream=sys.stdout,
     )
 
+    configs = json.load(open('res/configs.json', 'r'))
+    logger.info(f"web3 endpoint: {configs['web3EndPt']}")
+
     logger.info('Initializing EPD...')
 
     display = AutoEPDDisplay(vcom=V_COM, flip=True)
     logger.info(f'VCOM set to {display.epd.get_vcom()}')
 
-    web3 = Web3(Web3.HTTPProvider('https://mainnet.infura.io/v3/your-api-key'))
+    web3 = Web3(Web3.HTTPProvider(configs['web3EndPt']))
     App(web3=web3, display=display).main()
