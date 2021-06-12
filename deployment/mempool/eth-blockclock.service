@@ -3,9 +3,11 @@ Description=Ethereum Blockclock
 After=network.target
 
 [Service]
+# modify it per your runtime environment
 User=pi
 Group=pi
 WorkingDirectory=/home/pi/projects/eth-blockclock
+
 ExecStart=/usr/bin/make run_app
 Restart=on-failure
 

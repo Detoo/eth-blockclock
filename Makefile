@@ -16,3 +16,7 @@ build_app:
 # run the app (must sudo because we are using bcm2835 C library)
 run_app:
 	sudo python3 -m eth_blockclock
+
+# install the app as a systemctl service
+install_as_service:
+	sudo systemctl enable /path/to/your/eth-blockclock/deployment/mempool/eth-blockclock.service && sudo systemctl start eth-blockclock.service
